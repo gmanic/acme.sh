@@ -8,6 +8,7 @@ Options:
  NSUPDATE_SERVER_PORT Server port. Default: "53".
  NSUPDATE_KEY File path to TSIG key.
  NSUPDATE_ZONE Domain zone to update. Optional.
+ NSUPDATE_OPT Command line parameter to nsupdate. Optional.
 '
 
 ########  Public functions #####################
@@ -38,14 +39,15 @@ dns_nsupdate_add() {
   _info "adding ${fulldomain}. 60 in txt \"${txtvalue}\""
   [ -n "$DEBUG" ] && [ "$DEBUG" -ge "$DEBUG_LEVEL_1" ] && nsdebug="-d"
   [ -n "$DEBUG" ] && [ "$DEBUG" -ge "$DEBUG_LEVEL_2" ] && nsdebug="-D"
+  nsupdate_parameters="-k ${NSUPDATE_KEY} ${nsdebug} ${NSUPDATE_OPT}"
   if [ -z "${NSUPDATE_ZONE}" ]; then
-    nsupdate -k "${NSUPDATE_KEY}" $nsdebug "${NSUPDATE_OPT}" <<EOF
+    nsupdate "${nsupdate_parameters}" <<EOF
 server ${NSUPDATE_SERVER}  ${NSUPDATE_SERVER_PORT}
 update add ${fulldomain}. 60 in txt "${txtvalue}"
 send
 EOF
   else
-    nsupdate -k "${NSUPDATE_KEY}" $nsdebug "${NSUPDATE_OPT}" <<EOF
+    nsupdate "${nsupdate_parameters}" <<EOF
 server ${NSUPDATE_SERVER}  ${NSUPDATE_SERVER_PORT}
 zone ${NSUPDATE_ZONE}.
 update add ${fulldomain}. 60 in txt "${txtvalue}"
@@ -76,14 +78,15 @@ dns_nsupdate_rm() {
   _info "removing ${fulldomain}. txt"
   [ -n "$DEBUG" ] && [ "$DEBUG" -ge "$DEBUG_LEVEL_1" ] && nsdebug="-d"
   [ -n "$DEBUG" ] && [ "$DEBUG" -ge "$DEBUG_LEVEL_2" ] && nsdebug="-D"
+  nsupdate_parameters="-k ${NSUPDATE_KEY} ${nsdebug} ${NSUPDATE_OPT}"
   if [ -z "${NSUPDATE_ZONE}" ]; then
-    nsupdate -k "${NSUPDATE_KEY}" $nsdebug "${NSUPDATE_OPT}" <<EOF
+    nsupdate "${nsupdate_parameters}" <<EOF
 server ${NSUPDATE_SERVER}  ${NSUPDATE_SERVER_PORT}
 update delete ${fulldomain}. txt
 send
 EOF
   else
-    nsupdate -k "${NSUPDATE_KEY}" $nsdebug "${NSUPDATE_OPT}" <<EOF
+    nsupdate "${nsupdate_parameters}" <<EOF
 server ${NSUPDATE_SERVER}  ${NSUPDATE_SERVER_PORT}
 zone ${NSUPDATE_ZONE}.
 update delete ${fulldomain}. txt
