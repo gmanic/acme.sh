@@ -54,7 +54,8 @@ update add ${fulldomain}. 60 in txt "${txtvalue}"
 send
 EOF
   fi
-  if [ $? -ne 0 ]; then
+  RC=$?
+  if [ "${RC}" -ne 0 ]; then
     _err "error updating domain"
     return 1
   fi
@@ -93,6 +94,7 @@ update delete ${fulldomain}. txt
 send
 EOF
   fi
+  RC=$?
   if [ $? -ne 0 ]; then
     _err "error updating domain"
     return 1
